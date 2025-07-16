@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
         binding.button.setOnClickListener {
-            ChatListActivity.launch(this)
+            ChatListActivity.launch(this, binding.userId.text.toString())
         }
     }
 }
