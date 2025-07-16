@@ -11,12 +11,13 @@ android {
 
     defaultConfig {
         applicationId = "com.ishdemon.chatapp"
-        minSdk = 24
+        minSdk = 27
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "PIESOCKET_API_KEY", "\"htwbgMrb4KwXqUwfGvCk00oEExVM53ICTbhlUj1A\"")
+        buildConfigField("String", "PIESOCKET_CLUSTER_ID", "\"s14932.blr1\"")
     }
 
     buildTypes {
@@ -35,6 +36,11 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+
+    buildFeatures {
+        buildConfig = true
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -49,9 +55,12 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
+    implementation(libs.gson)
 
     implementation(libs.room.runtime)
+    implementation("androidx.room:room-ktx:2.6.1")
     kapt(libs.room.compiler)
 
     implementation(libs.lifecycle.viewmodel.ktx)
+    implementation("com.piesocket:channels-sdk:1.0.5")
 }
