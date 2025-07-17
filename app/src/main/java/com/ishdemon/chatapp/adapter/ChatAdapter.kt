@@ -47,7 +47,6 @@ class ChatAdapter(
             fun bind(msg: ChatMessage) {
                 binding.messageText.text = msg.content
                 binding.retryIcon.isVisible = !msg.isSent
-                // No userText if self
             }
         }
     }
