@@ -3,6 +3,7 @@ package com.ishdemon.chatapp.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -45,7 +46,7 @@ class ChatAdapter(
         class Right(private val binding: ItemChatRightBinding) : ChatViewHolder(binding.root) {
             fun bind(msg: ChatMessage) {
                 binding.messageText.text = msg.content
-
+                binding.retryIcon.isVisible = !msg.isSent
                 // No userText if self
             }
         }

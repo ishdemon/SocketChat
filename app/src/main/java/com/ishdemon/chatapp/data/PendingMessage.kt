@@ -16,6 +16,7 @@ data class PendingMessage(
         roomId = roomId,
         senderId = senderId,
         content = content,
-        timestamp = timestamp
+        timestamp = timestamp,
+        isSent = false
     )
 }

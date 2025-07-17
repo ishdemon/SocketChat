@@ -52,7 +52,12 @@ class ChatActivity : AppCompatActivity() {
 
         binding.sendButton.setOnClickListener {
             val msg = binding.messageInput.text.toString()
-            val chatMsg = ChatMessage(roomId, userId, msg, System.currentTimeMillis())
+            val chatMsg = ChatMessage(
+                roomId = roomId,
+                senderId = userId,
+                content = msg,
+                timestamp = System.currentTimeMillis()
+            )
             viewModel.sendMessage(roomId,chatMsg)
             binding.messageInput.text.clear()
         }

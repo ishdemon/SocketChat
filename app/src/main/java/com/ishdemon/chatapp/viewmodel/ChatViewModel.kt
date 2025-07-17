@@ -45,7 +45,10 @@ class ChatViewModel @Inject constructor(
     fun sendMessage(roomId: String,message: ChatMessage) {
         if(isConnected(roomId).value == true) {
             socketManager.sendMessage(roomId, message)
-        } else queueOffline(message)
+        } else {
+            message.isSent = false
+            queueOffline(message)
+        }
         messageList.add(message)
         _messages.postValue(messageList.toList())
     }
@@ -71,10 +74,19 @@ class ChatViewModel @Inject constructor(
     suspend fun retryQueuedMessages() {
         val pending = messageDao.getAll()
         for (p in pending) {
-            val msg = p.ToChatMessage()
+            val msg = p.ToChatMessage().copy(isSent = true)
             if (isConnected(msg.roomId).value == true) {
                 socketManager.sendMessage(msg.roomId,msg)
                 messageDao.delete(p)
+
+                val index = messageList.indexOfFirst { it.timestamp == msg.timestamp }
+                if (index != -1) {
+                    messageList[index] = msg
+                } else {
+                    messageList.add(msg)
+                }
+
+                _messages.postValue(messageList.toList())
             }
         }
     }
