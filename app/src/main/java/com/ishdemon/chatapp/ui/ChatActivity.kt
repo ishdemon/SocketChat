@@ -2,6 +2,7 @@ package com.ishdemon.chatapp.ui
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -67,7 +68,10 @@ class ChatActivity : AppCompatActivity() {
         }
 
         viewModel.isConnected(roomId).observe(this) {
-            binding.tvStatus.text = if(it)"ONLINE" else " OFFLINE"
+            binding.tvStatus.apply {
+                setTextColor(if(it) Color.GREEN else Color.RED)
+                text = if(it)"ONLINE" else " OFFLINE"
+            }
             lifecycleScope.launch {
                 if(it) viewModel.retryQueuedMessages()
             }

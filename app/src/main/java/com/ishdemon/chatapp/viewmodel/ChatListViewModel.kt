@@ -15,8 +15,8 @@ class ChatListViewModel @Inject constructor() : ViewModel() {
 
     init {
         _chatRooms.value = listOf(
-            ChatRoom("chatroom1", "General", "Welcome", System.currentTimeMillis()),
-            ChatRoom("chatroom2", "Random", "Hello", System.currentTimeMillis() - 2000)
+            ChatRoom("chatroom1", "General", "", System.currentTimeMillis()),
+            ChatRoom("chatroom2", "Random", "", System.currentTimeMillis() - 2000)
         )
     }
 }

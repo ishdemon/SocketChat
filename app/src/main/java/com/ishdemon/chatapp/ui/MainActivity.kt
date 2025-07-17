@@ -1,8 +1,10 @@
 package com.ishdemon.chatapp.ui
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.ishdemon.chatapp.databinding.ActivityMainBinding
@@ -13,6 +15,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         enableEdgeToEdge()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -24,7 +27,9 @@ class MainActivity : AppCompatActivity() {
             insets
         }
         binding.button.setOnClickListener {
-            ChatListActivity.launch(this, binding.userId.text.toString())
+            if(binding.userId.text.isNotEmpty())
+                ChatListActivity.launch(this, binding.userId.text.toString())
+            else Toast.makeText(this,"Enter username", Toast.LENGTH_SHORT).show()
         }
     }
 }
