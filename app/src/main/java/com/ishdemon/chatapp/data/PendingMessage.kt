@@ -13,6 +13,9 @@ data class PendingMessage(
 ){
 
     fun ToChatMessage() = ChatMessage(
-        senderId, roomId, content, timestamp
+        roomId = roomId,
+        senderId = senderId,
+        content = content,
+        timestamp = timestamp
     )
 }

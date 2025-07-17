@@ -15,4 +15,7 @@ interface MessageDao {
 
     @Delete
     suspend fun delete(message: PendingMessage)
+
+    @Query("DELETE FROM pending_messages")
+    suspend fun deleteAll()
 }

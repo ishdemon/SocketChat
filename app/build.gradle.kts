@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.gson)
 
     implementation(libs.room.runtime)
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     kapt(libs.room.compiler)
 

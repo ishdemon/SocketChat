@@ -19,18 +19,29 @@ class SocketManager @Inject constructor(
 ) {
     private val pieSocket = PieSocket(options)
     private val channels = mutableMapOf<String, Channel>()
-    private val _connected = MutableLiveData<Boolean>()
-    val connected: LiveData<Boolean> get() = _connected
+
+    private val connectionStatusMap = mutableMapOf<String, MutableLiveData<Boolean>>()
+
+    fun isConnected(roomId: String): LiveData<Boolean> {
+        return connectionStatusMap.getOrPut(roomId) { MutableLiveData(false) }
+    }
 
     fun connect(roomId: String, onMessageReceived: (String) -> Unit) {
-        if (channels.containsKey(roomId)) return
-
+        channels[roomId]?.disconnect()
+        channels[roomId]?.connect(roomId)
         val channel = pieSocket.join(roomId)
-
         channel.listen("system:connected", object : PieSocketEventListener() {
             override fun handleEvent(event: PieSocketEvent?) {
                 Log.d("PieSocket", "Connected to $roomId")
-                _connected.postValue(true)
+                connectionStatusMap.getOrPut(roomId) { MutableLiveData() }.postValue(true)
+            }
+        })
+
+        channel.listen("system:error", object : PieSocketEventListener() {
+            override fun handleEvent(event: PieSocketEvent?) {
+                //Log.d("PieSocket", "Connected to $roomId")
+                disconnect(roomId)
+                connectionStatusMap.getOrPut(roomId) { MutableLiveData() }.postValue(false)
             }
         })
 
@@ -48,10 +59,6 @@ class SocketManager @Inject constructor(
         channels[roomId] = channel
     }
 
-    fun isConnected(roomId: String): Boolean {
-        return channels[roomId] != null && connected.value == true
-    }
-
     fun sendMessage(roomId: String, message: ChatMessage) {
         val event = PieSocketEvent("new-message")
         event.setData(message.toJson())
@@ -59,8 +66,10 @@ class SocketManager @Inject constructor(
     }
 
     fun disconnect(roomId: String) {
+        pieSocket.leave(roomId)
         channels[roomId]?.disconnect()
         channels.remove(roomId)
+        connectionStatusMap[roomId]?.postValue(false)
     }
 
     fun disconnectAll() {

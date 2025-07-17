@@ -9,7 +9,10 @@ import com.ishdemon.chatapp.data.ChatMessage
 import com.ishdemon.chatapp.data.MessageDao
 import com.ishdemon.chatapp.data.ToEntity
 import com.ishdemon.chatapp.data.toChatMessage
+import com.ishdemon.chatapp.network.NetworkMonitor
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,6 +28,8 @@ class ChatViewModel @Inject constructor(
 
     private val messageList = mutableListOf<ChatMessage>()
 
+    fun isConnected(roomId: String): LiveData<Boolean> = socketManager.isConnected(roomId)
+
     fun connect(roomId: String, userId: String) {
         socketManager.connect(roomId) { json ->
             val message = json.toChatMessage()
@@ -38,13 +43,21 @@ class ChatViewModel @Inject constructor(
     }
 
     fun sendMessage(roomId: String,message: ChatMessage) {
-        socketManager.sendMessage(roomId,message)
+        if(isConnected(roomId).value == true) {
+            socketManager.sendMessage(roomId, message)
+        } else queueOffline(message)
         messageList.add(message)
         _messages.postValue(messageList.toList())
     }
 
     fun disconnect(roomId: String) {
         socketManager.disconnect(roomId)
+    }
+
+    fun clearDb() {
+        viewModelScope.launch {
+            messageDao.deleteAll()
+        }
     }
 
     private fun queueOffline(msg: ChatMessage) {
@@ -55,12 +68,12 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private suspend fun retryQueuedMessages(roomId: String) {
+    suspend fun retryQueuedMessages() {
         val pending = messageDao.getAll()
         for (p in pending) {
             val msg = p.ToChatMessage()
-            if (socketManager.isConnected(roomId)) {
-                socketManager.sendMessage(roomId,msg)
+            if (isConnected(msg.roomId).value == true) {
+                socketManager.sendMessage(msg.roomId,msg)
                 messageDao.delete(p)
             }
         }
